@@ -2,7 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const reqUrl = new URL(request.url);
     const reponame = reqUrl.pathname;
-    const gist = reqUrl.searchParams.get("gist");
+    let gist = Boolean(reqUrl.searchParams.get("gist"));
     // repo regex
     if (!/^\/[\w\.-]+\/[\w\.-]+$/.test(reponame)) return new Response("null");
     // gist regex
