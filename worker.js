@@ -11,7 +11,7 @@ export default {
     // gist regex
     if (/^([a-f0-9]{32})$/.test(reponame)) gist = true;
     if (gist) {
-      const apiRepoURL = `https://api.github.com/gists${reponame.split("/")[1]}`;
+      const apiRepoURL = `https://api.github.com/gists${reponame.split("/")[2]}`;
       const date = await fetch(apiRepoURL, {
         headers,
       })
