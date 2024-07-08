@@ -7,11 +7,11 @@ export default {
     };
     let gist = Boolean(reqUrl.searchParams.get("gist"));
     // repo regex
-    if (!/^\/[\w\.-]+\/[\w\.-]+$/.test(reponame)) return new Response("null");
+    if (!/^(\/[\w\.-]+\/[\w\.-]+)|([a-f0-9]{32})$/.test(reponame)) return new Response("null");
     // gist regex
-    if (/^([a-f0-9]{32})$/.test(reponame)) gist = true;
+    if (/^\/[a-f0-9]{32}$/.test(reponame)) gist = true;
     if (gist) {
-      const apiRepoURL = `https://api.github.com/gists${reponame.split("/")[2]}`;
+      const apiRepoURL = `https://api.github.com/gists${reponame}`;
       const date = await fetch(apiRepoURL, {
         headers,
       })
