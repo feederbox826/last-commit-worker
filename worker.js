@@ -1,7 +1,7 @@
 const headers = {
   "User-Agent": "fbox826/last-commit",
 };
-const returnDate = async (field) => `<date>${field.split("T")[0]}</date>`;
+const returnDate = (field) => `<date>${field.split("T")[0]}</date>`;
 const repoRegex = new RegExp(/^\/[\w\.-]+\/[\w\.-]+$/);
 const gistRegex = new RegExp(/^\/[a-f0-9]{32}$/);
 
