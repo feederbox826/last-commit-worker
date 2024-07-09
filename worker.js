@@ -1,31 +1,32 @@
+const headers = {
+  "User-Agent": "fbox826/last-commit",
+};
+const returnDate = async (field) => `<date>${field.split("T")[0]}</date>`;
+const repoRegex = new RegExp(/^\/[\w\.-]+\/[\w\.-]+$/);
+const gistRegex = new RegExp(/^\/[a-f0-9]{32}$/);
+
 export default {
   async fetch(request, env, ctx) {
-    const reqUrl = new URL(request.url);
-    const reponame = reqUrl.pathname;
-    const headers = {
-      "User-Agent": "fbox826/last-commit",
-    };
-    let gist = Boolean(reqUrl.searchParams.get("gist"));
-    // repo regex
-    if (!/^(\/[\w\.-]+\/[\w\.-]+)|([a-f0-9]{32})$/.test(reponame)) return new Response("null");
-    // gist regex
-    if (/^\/[a-f0-9]{32}$/.test(reponame)) gist = true;
-    if (gist) {
-      const apiRepoURL = `https://api.github.com/gists${reponame}`;
-      const date = await fetch(apiRepoURL, {
+    const reponame = new URL(request.url).pathname;
+    if (gistRegex.test(reponame)) {
+      const date = await fetch(`https://api.github.com/gists${reponame}`, {
         headers,
       })
         .then((response) => response.json())
-        .then((data) => data.updated_at.split("T")[0]);
-      return new Response(`<date>${date}</date>`);
+        .then((data) => data.updated_at)
+        .catch(err => new Response("error"));
+      return new Response(returnDate(date));
+    } else if (repoRegex.test(reponame)) {
+      const date = await fetch(`https://api.github.com/repos${reponame}/commits`, {
+        headers,
+      })
+        .then((response) => response.json())
+        .then((data) => data[0].commit.author.date)
+        .catch(err => new Response("error"));
+      return new Response(returnDate(date));
     } else {
-      const apiRepoURL = `https://api.github.com/repos${reponame}/commits`;
-      const date = await fetch(apiRepoURL, {
-        headers,
-      })
-        .then((response) => response.json())
-        .then((data) => data[0].commit.author.date.split("T")[0]);
-      return new Response(`<date>${date}</date>`);
+      // invalid syntax
+      return new Response("null");
     }
   },
 };
