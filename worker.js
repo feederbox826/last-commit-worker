@@ -30,7 +30,7 @@ export default {
         .then((response) => response.json())
         .then((data) => data.updated_at)
         .then(returnDate)
-        .catch((err) => "error");
+        .catch((err) => err);
       return new Response(res);
     } else if (repoRegex.test(reponame)) {
       const res = await fetch(
@@ -40,7 +40,7 @@ export default {
         .then((response) => response.json())
         .then((data) => data[0].commit.author.date)
         .then(returnDate)
-        .catch((err) => "error");
+        .catch((err) => err);
       return new Response(res);
     } else {
       // invalid syntax
