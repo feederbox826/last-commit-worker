@@ -12,11 +12,10 @@ export default {
     const fetchOptions = {
       headers,
       cf: {
-        cacheTtl: 86400, // 1 day
+        cacheTtl: 604800, // 1 week
         cacheEverything: true,
-        cacheKey: reponame,
         cacheTtlByStatus: {
-          "200-299": 86400, // 1 day
+          "200-299": 604800, // 1 week
           404: 60, // 1 minute
           "500-599": 0, // no cache
         },
