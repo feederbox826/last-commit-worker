@@ -60,9 +60,10 @@ const kvLookup = async (reponame, env, skip = false) => {
       : repoRegex.test(reponame)
         ? repoLookup(reponame)
         : "null";
-  if (res == "null") return "null"
-  await cachePut(reponame, res, env);
-  return returnDate(res);
+  const resolv = await res
+  if (resolv == "null") return "null"
+  await cachePut(reponame, resolv, env);
+  return returnDate(resolv);
 }
 
 export default {
