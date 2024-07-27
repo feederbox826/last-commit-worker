@@ -43,14 +43,14 @@ const cacheTtl = (date) => {
   return 0;
 }
 
-const cachePut = async (reponame, date) => {
+const cachePut = async (reponame, date, env) => {
   const expirationTtl = cacheTtl(date);
   if (expirationTtl === 0) return
   await env.KV_COMMITS.put(reponame, date, { expirationTtl });
 }
 
 // KV lookup
-const kvLookup = async (reponame, skip = false) => {
+const kvLookup = async (reponame, env, skip = false) => {
   // tiered cache lookup
   const cached = await env.KV_COMMITS.get(reponame);
   let res = cached
@@ -61,7 +61,7 @@ const kvLookup = async (reponame, skip = false) => {
         ? repoLookup(reponame)
         : "null";
   if (res == "null") return "null"
-  await cachePut(reponame, res);
+  await cachePut(reponame, res, env);
   return returnDate(res);
 }
 
@@ -69,9 +69,9 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const reponame = url.pathname;
-    const skip = url.query.get("refresh") === "true";
+    const skip = url.searchParams.get("refresh") === "true";
     // look up in KV
-    const res = await kvLookup(reponame, skip);
+    const res = await kvLookup(reponame, env, skip,);
     return new Response(res);
   }
 };
