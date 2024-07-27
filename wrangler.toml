@@ -1,3 +1,6 @@
 name = "last-commit"
 main = "worker.js"
 compatibility_date = "2024-07-01"
+kv_namespaces = [
+    { binding = "KV_COMMITS", id = "3235bcdaa3a04d6fa8b5047c635d5c93" }
+]
