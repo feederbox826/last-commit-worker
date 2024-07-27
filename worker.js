@@ -50,11 +50,11 @@ const cachePut = async (reponame, date) => {
 }
 
 // KV lookup
-const kvLookup = async (reponame) => {
+const kvLookup = async (reponame, skip = false) => {
   // tiered cache lookup
   const cached = await env.KV_COMMITS.get(reponame);
   let res = cached
-    ? cached
+    ? cached || skip
     : gistRegex.test(reponame)
       ? gistLookup(reponame)
       : repoRegex.test(reponame)
@@ -67,9 +67,11 @@ const kvLookup = async (reponame) => {
 
 export default {
   async fetch(request, env, ctx) {
-    const reponame = new URL(request.url).pathname;
+    const url = new URL(request.url);
+    const reponame = url.pathname;
+    const skip = url.query.get("refresh") === "true";
     // look up in KV
-    const res = await kvLookup(reponame);
+    const res = await kvLookup(reponame, skip);
     return new Response(res);
   }
 };
