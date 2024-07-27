@@ -33,7 +33,7 @@ const cacheTtl = (date) => {
   // if less than 1w, cache 1d
   if (diff < week * 1000) {
     return day;
-  } else if (diff < month * 100) {
+  } else if (diff < month * 1000) {
     // if less than 1m, cache 1w
     return week;
   } else if (diff > month * 1000) {
