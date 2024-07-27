@@ -46,13 +46,13 @@ const cacheTtl = (date) => {
 const cachePut = async (reponame, date) => {
   const expirationTtl = cacheTtl(date);
   if (expirationTtl === 0) return
-  await KV_COMMITS.put(reponame, date, { expirationTtl });
+  await env.KV_COMMITS.put(reponame, date, { expirationTtl });
 }
 
 // KV lookup
 const kvLookup = async (reponame) => {
   // tiered cache lookup
-  const cached = await KV_COMMITS.get(reponame);
+  const cached = await env.KV_COMMITS.get(reponame);
   let res = cached
     ? cached
     : gistRegex.test(reponame)
