@@ -61,7 +61,7 @@ const kvLookup = async (reponame, env, skip = false) => {
         ? repoLookup(reponame)
         : "null";
   const resolv = await res
-  if (resolv == "null") return "null"
+  if (resolv == "null" || isNaN(Date.parse(resolv))) return "null";
   await cachePut(reponame, resolv, env);
   return returnDate(resolv);
 }
