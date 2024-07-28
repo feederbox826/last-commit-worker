@@ -46,6 +46,9 @@ const cacheTtl = (date) => {
 const cachePut = async (reponame, date, env) => {
   const expirationTtl = cacheTtl(date);
   if (expirationTtl === 0) return
+  // only set if value is different
+  const currentValue = await env.KV_COMMITS.get(reponame);
+  if (currentValue === date) return
   await env.KV_COMMITS.put(reponame, date, { expirationTtl });
 }
 
