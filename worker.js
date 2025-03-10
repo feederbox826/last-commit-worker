@@ -2,6 +2,7 @@ const headers = {
   "User-Agent": "fbox826/last-commit/v1"
 }
 const returnDate = (field) => `<date>${field.split("T")[0]}</date>`
+const rawDateOnly = (field) => field.split("T")[0]
 const repoRegex = new RegExp(/^\/[\w\.-]+\/[\w\.-]+$/)
 const gistRegex = new RegExp(/^\/[a-f0-9]{32}$/)
 
@@ -77,6 +78,6 @@ export default {
       : await splitLookup(reponame, env)
     return xml
       ? new Response(returnDate(res))
-      : new Response(res)
+      : new Response(rawDateOnly(res))
   }
 }
