@@ -58,11 +58,11 @@ const ghLookup = async (reponame, env) => {
 const splitLookup = async (reponame, env, skip = false) => {
   // prefer KV lookup, fallback
   const kvResult = await env.KV_COMMITS.get(reponame, { cacheTtl: 86400 })
-  if (kvResult) return returnDate(kvResult)
+  if (kvResult) return kvResult
   // ghLookup as fallback
   const ghResult = await ghLookup(reponame, env)
   if (ghResult == "null" || isNaN(Date.parse(ghResult))) return "null"
-  return returnDate(ghResult)
+  return ghResult
 }
 
 export default {
@@ -70,10 +70,13 @@ export default {
     const url = new URL(request.url);
     const reponame = url.pathname;
     const skip = url.searchParams.get("refresh") === "true"
+    const xml = url.searchParams.get("raw") !== "true"
     // look up in KV
     const res = skip
       ? await ghLookup(reponame, env)
       : await splitLookup(reponame, env)
-    return new Response(res)
+    return xml
+      ? new Response(returnDate(res))
+      : new Response(res)
   }
 }
