@@ -4,6 +4,7 @@ const headers = {
 const returnDate = (field) => `<date>${field.split("T")[0]}</date>`
 const rawDateOnly = (field) => field.split("T")[0]
 const repoRegex = new RegExp(/^\/[\w\.-]+\/[\w\.-]+$/)
+const branchRegex = new RegExp(/^\/[\w\.-]+\/[\w\.-]+\/.+$/)
 const gistRegex = new RegExp(/^\/[a-f0-9]{32}$/)
 
 const gistLookup = (reponame) =>
@@ -12,8 +13,8 @@ const gistLookup = (reponame) =>
     .then(data => data.updated_at)
     .catch(err => err)
 
-const repoLookup = (reponame) =>
-  fetch(`https://api.github.com/repos${reponame}/commits`, { headers })
+const repoLookup = (reponame, branch) =>
+  fetch(`https://api.github.com/repos${reponame}/commits${branch?`?sha=${branch}`:""}`, { headers })
     .then(response => response.json())
     .then(data => data[0].commit.author.date)
     .catch(err => err)
@@ -49,7 +50,9 @@ const ghLookup = async (reponame, env) => {
     ? await gistLookup(reponame)
     : repoRegex.test(reponame)
       ? await repoLookup(reponame)
-      : "null"
+      : branchRegex.test(reponame)
+        ? await repoLookup(reponame.split("/").slice(0, 3).join("/"), reponame.split("/").pop())
+        : "null"
   // async cache put
   cachePut(reponame, lookup, env)
   return lookup
