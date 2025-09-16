@@ -59,7 +59,7 @@ const ghLookup = async (reponame, env) => {
 }
 
 // KV lookup
-const splitLookup = async (reponame, env, skip = false) => {
+const splitLookup = async (reponame, env) => {
   // prefer KV lookup, fallback
   const kvResult = await env.KV_COMMITS.get(reponame, { cacheTtl: 86400 })
   if (kvResult) return kvResult
@@ -73,6 +73,8 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const reponame = url.pathname;
+    // early exit for null or invalid
+    if (reponame == "") return new Response("invalid", { status: 400 })
     const skip = url.searchParams.get("refresh") === "true"
     const xml = url.searchParams.get("raw") !== "true"
     // look up in KV
