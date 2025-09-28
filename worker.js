@@ -1,5 +1,7 @@
 const headers = {
-  "User-Agent": "fbox826/last-commit/v1"
+  "User-Agent": "fbox826/last-commit/v1",
+  "Accept": "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28"
 }
 const returnDate = (field) => `<date>${field.split("T")[0]}</date>`
 const rawDateOnly = (field) => field.split("T")[0]
@@ -71,6 +73,8 @@ const splitLookup = async (reponame, env) => {
 
 export default {
   async fetch(request, env, ctx) {
+    // set headers
+    headers["Authorization"] = `Bearer ${env.GITHUB_TOKEN}`
     const url = new URL(request.url);
     const reponame = url.pathname;
     // early exit for null or invalid
