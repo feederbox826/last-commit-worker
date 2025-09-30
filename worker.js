@@ -27,16 +27,13 @@ const cacheTtl = (date) => {
   if (isNaN(parsedDate)) return 0
   const diff = Date.now() - parsedDate
   if (isNaN(diff)) return 0
-  const day = 86400
   const week = 604800
   const month = 2592000
-  return diff < week * 1000
-    ? day // if less than 1wk, cache 1d
-    : diff < month * 1000
-      ? week // if less than 1mo, cache 1wk
-      : diff > month * 1000
-        ? month // if more than 1mo, cache 1mo
-        : 0
+  return diff < month * 1000
+    ? week // if less than 1mo, cache 1wk
+    : diff > month * 1000
+      ? month // if more than 1mo, cache 1mo
+      : 0
 }
 
 const cachePut = (reponame, date, env) => {
