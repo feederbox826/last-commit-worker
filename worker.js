@@ -34,12 +34,12 @@ const cacheTtl = (date) => {
     : MONTH // else, cache 1mo
 }
 
-const cachePut = (reponame, date, env) => {
+const cachePut = async (reponame, date, env) => {
   const expirationTtl = cacheTtl(date)
   console.log(`caching ${reponame} for ${expirationTtl} seconds`)
   // only set if value is different
   if (expirationTtl === 0) return
-  env.KV_COMMITS.put(reponame, date, { expirationTtl })
+  await env.KV_COMMITS.put(reponame, date, { expirationTtl })
 }
 
 const ghLookup = async (reponame, env, ctx) => {
