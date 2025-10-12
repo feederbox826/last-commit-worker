@@ -59,8 +59,12 @@ const ghLookup = async (reponame, env, ctx) => {
 const splitLookup = async (reponame, env, ctx) => {
   // prefer KV lookup, fallback
   const kvResult = await env.KV_COMMITS.get(reponame)
-  if (kvResult) return kvResult
+  if (kvResult) {
+    console.log("KV HIT")
+    return kvResult
+  }
   // ghLookup as fallback
+  console.log("KV MISS")
   const ghResult = await ghLookup(reponame, env, ctx)
   if (ghResult == "null" || isNaN(Date.parse(ghResult))) return "null"
   return ghResult
