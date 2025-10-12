@@ -25,15 +25,13 @@ const repoLookup = (reponame, branch) =>
 const cacheTtl = (date) => {
   const parsedDate = Date.parse(date)
   if (isNaN(parsedDate)) return 0
-  const diff = Date.now() - parsedDate
-  if (isNaN(diff)) return 0
-  const week = 604800
-  const month = 2592000
-  return diff < month * 1000
-    ? week // if less than 1mo, cache 1wk
-    : diff > month * 1000
-      ? month // if more than 1mo, cache 1mo
-      : 0
+  const diffSec = (Date.now() - parsedDate) / 1000
+  if (isNaN(diffSec)) return 0
+  const WEEK = 7 * 24 * 60 * 60
+  const MONTH = 30 * 24 * 60 * 60
+  return diffSec < MONTH
+    ? WEEK // if less than 1mo, cache 1wk
+    : MONTH // else, cache 1mo
 }
 
 const cachePut = (reponame, date, env) => {
@@ -43,7 +41,7 @@ const cachePut = (reponame, date, env) => {
   env.KV_COMMITS.put(reponame, date, { expirationTtl })
 }
 
-const ghLookup = async (reponame, env) => {
+const ghLookup = async (reponame, env, ctx) => {
   // look up and cache
   const lookup = gistRegex.test(reponame)
     ? await gistLookup(reponame)
@@ -53,17 +51,17 @@ const ghLookup = async (reponame, env) => {
         ? await repoLookup(reponame.split("/").slice(0, 3).join("/"), reponame.split("/").pop())
         : "null"
   // async cache put
-  cachePut(reponame, lookup, env)
+  ctx.waitUntil(cachePut(reponame, lookup, env))
   return lookup
 }
 
 // KV lookup
-const splitLookup = async (reponame, env) => {
+const splitLookup = async (reponame, env, ctx) => {
   // prefer KV lookup, fallback
-  const kvResult = await env.KV_COMMITS.get(reponame, { cacheTtl: 86400 })
+  const kvResult = await env.KV_COMMITS.get(reponame)
   if (kvResult) return kvResult
   // ghLookup as fallback
-  const ghResult = await ghLookup(reponame, env)
+  const ghResult = await ghLookup(reponame, env, ctx)
   if (ghResult == "null" || isNaN(Date.parse(ghResult))) return "null"
   return ghResult
 }
@@ -80,8 +78,8 @@ export default {
     const xml = url.searchParams.get("raw") !== "true"
     // look up in KV
     const res = skip
-      ? await ghLookup(reponame, env)
-      : await splitLookup(reponame, env)
+      ? await ghLookup(reponame, env, ctx)
+      : await splitLookup(reponame, env, ctx)
     return xml
       ? new Response(returnDate(res))
       : new Response(rawDateOnly(res))
