@@ -1,0 +1,15 @@
+{
+  "name": "last-commit",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-28",
+  "kv_namespaces": [
+    {
+      "binding": "KV_COMMITS",
+      "id": "3235bcdaa3a04d6fa8b5047c635d5c93"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.01
+  }
+}
